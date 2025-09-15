@@ -1,15 +1,21 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
-  FlatList,
-  TextInput,
-  View,
-  Text,
   Dimensions,
-  Platform,
+  FlatList,
   Keyboard,
-  ViewStyle,
   Modal,
+  Platform,
+  Text,
+  TextInput,
   TextStyle,
+  View,
+  ViewStyle,
 } from "react-native";
 import Animated, {
   Extrapolate,
@@ -19,24 +25,24 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import {
-  CountryItem,
-  ItemTemplateProps,
-  Style,
-  ListHeaderComponentProps,
-} from "./types/Types";
-import { useKeyboardStatus } from "./helpers/useKeyboardStatus";
 import { CountryButton } from "./components/CountryButton";
 import { countriesRemover } from "./helpers/countriesRemover";
 import { removeDiacritics } from "./helpers/diacriticsRemover";
+import { useKeyboardStatus } from "./helpers/useKeyboardStatus";
+import {
+  CountryItem,
+  ItemTemplateProps,
+  ListHeaderComponentProps,
+  Style,
+} from "./types/Types";
 
-export { countryCodes } from "./constants/countryCodes";
 export { CountryButton } from "./components/CountryButton";
+export { countryCodes } from "./constants/countryCodes";
 export type {
   CountryItem,
   ItemTemplateProps,
-  Style,
   ListHeaderComponentProps,
+  Style,
 } from "./types/Types";
 
 const height = Dimensions.get("window").height;
@@ -83,6 +89,14 @@ interface Props {
   searchMessage?: string;
   androidWindowSoftInputMode?: string;
   initialState?: string;
+  initialCountry?: string;
+  scrollToInitialCountry?: boolean;
+  initialScrollDelay?: number;
+  accessibilityLabel?: string;
+  getItemLayout?: (
+    data: any,
+    index: number
+  ) => { length: number; offset: number; index: number };
 }
 
 export const CountryPicker = ({
@@ -104,11 +118,15 @@ export const CountryPicker = ({
   showOnly,
   ListHeaderComponent,
   itemTemplate: ItemTemplate = CountryButton,
+  initialCountry,
+  scrollToInitialCountry = true,
+  initialScrollDelay = 300,
   ...rest
 }: Props) => {
   // ToDo refactor exclude and showOnly props to objects
   let filteredCodes = countriesRemover(excludedCountries);
   const keyboardStatus = useKeyboardStatus();
+  const flatListRef = useRef<FlatList>(null);
 
   // Reanimated shared values
   const progress = useSharedValue(0); // 0 -> hidden, 1 -> visible
@@ -175,6 +193,45 @@ export const CountryPicker = ({
       );
     });
   }, [searchValue, codes, lang]);
+
+  useEffect(() => {
+    if (showModal && scrollToInitialCountry && initialCountry) {
+      const selectedIndex = codes.findIndex(
+        (country) => country.code === initialCountry.toUpperCase()
+      );
+
+      if (selectedIndex !== -1) {
+        const timer = setTimeout(() => {
+          flatListRef.current?.scrollToIndex({
+            index: selectedIndex,
+            animated: true,
+            viewPosition: 0.5,
+          });
+        }, initialScrollDelay);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [showModal, initialCountry, codes, scrollToInitialCountry]);
+
+  const handleScrollToIndexFailed = useCallback(
+    (info: { index: number; highestMeasuredFrameIndex: number }) => {
+      if (!flatListRef.current) return;
+
+      const timer = setTimeout(() => {
+        if (flatListRef.current) {
+          flatListRef.current.scrollToIndex({
+            index: info.index,
+            animated: true,
+            viewPosition: 0.5,
+          });
+        }
+      }, 500);
+
+      return () => clearTimeout(timer);
+    },
+    []
+  );
 
   // Animated styles
   const modalAnimatedStyle = useAnimatedStyle(() => {
@@ -248,6 +305,15 @@ export const CountryPicker = ({
     return "CountryItem" + item.code + index;
   }, []);
 
+  const getItemLayout = useCallback(
+    (data: any, index: number) => ({
+      length: 56, // Chiều cao cố định của CountryButton (50 + marginVertical 2*2 + padding)
+      offset: 56 * index,
+      index,
+    }),
+    []
+  );
+
   return (
     <Modal
       animationType="fade"
@@ -293,6 +359,9 @@ export const CountryPicker = ({
               placeholder={inputPlaceholder || "Search your country"}
               placeholderTextColor={inputPlaceholderTextColor || "#8c8c8c"}
               testID="countryCodesPickerSearchInput"
+              accessibilityLabel={rest.accessibilityLabel || "Search country"}
+              accessibilityHint="Type to search for a country by name or dial code"
+              accessibilityRole="search"
               {...rest}
             />
           </View>
@@ -315,15 +384,20 @@ export const CountryPicker = ({
             </View>
           ) : (
             <FlatList
+              ref={flatListRef}
               showsVerticalScrollIndicator={false}
               data={resultCountries || codes}
               keyExtractor={keyExtractor}
               initialNumToRender={10}
               maxToRenderPerBatch={10}
+              windowSize={10}
+              removeClippedSubviews={Platform.OS !== "web"} // Tối ưu hiệu năng
+              getItemLayout={rest.getItemLayout || getItemLayout} // Cho phép override
               style={[style?.itemsList]}
               keyboardShouldPersistTaps={"handled"}
               renderItem={renderItem}
               testID="countryCodesPickerFlatList"
+              onScrollToIndexFailed={handleScrollToIndexFailed}
               ListHeaderComponent={
                 popularCountries && ListHeaderComponent && !searchValue ? (
                   <ListHeaderComponent
