@@ -197,7 +197,8 @@ export const CountryPicker = ({
   useEffect(() => {
     if (showModal && scrollToInitialCountry && initialCountry) {
       const selectedIndex = codes.findIndex(
-        (country) => country.code === initialCountry.toUpperCase()
+        (country) =>
+          country.dial_code?.toUpperCase() === initialCountry.toUpperCase()
       );
 
       if (selectedIndex !== -1) {
