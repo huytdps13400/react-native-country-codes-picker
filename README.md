@@ -18,13 +18,13 @@
 
 ```bash
 # Using npm
-npm install react-native-country-codes-picker
+npm install @huymobile/react-native-country-codes-picker
 
 # Using yarn
-yarn add react-native-country-codes-picker
+yarn add @huymobile/react-native-country-codes-picker
 
 # Using expo
-expo install react-native-country-codes-picker
+expo install @huymobile/react-native-country-codes-picker
 ```
 
 This package requires `react-native-reanimated` (>= 3.0.0) as a peer dependency.
