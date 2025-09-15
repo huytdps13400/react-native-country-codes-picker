@@ -43,8 +43,5 @@
     "typescript": "^4.8.2",
     "react-native-reanimated": "3.19.1"
   },
-  "homepage": "https://github.com/huytdps13400/react-native-country-codes-picker#readme",
-  "overrides": {
-    "react-native-reanimated": "3.19.1"
-  }
+  "homepage": "https://github.com/huytdps13400/react-native-country-codes-picker#readme"
 }
