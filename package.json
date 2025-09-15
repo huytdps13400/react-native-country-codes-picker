@@ -1,6 +1,6 @@
 {
-  "name": "@huytran/react-native-country-codes-picker",
-  "version": "1.0.0",
+  "name": "@huymobile/react-native-country-codes-picker",
+  "version": "1.0.1",
   "description": "This lib. provide country iso picker with search functionality",
   "main": "index.tsx",
   "scripts": {
