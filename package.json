@@ -1,5 +1,5 @@
 {
-  "name": "react-native-country-codes-picker",
+  "name": "@huytran/react-native-country-codes-picker",
   "version": "2.3.5",
   "description": "This lib. provide country iso picker with search functionality",
   "main": "index.tsx",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GeorgeHop/react-native-country-codes-picker.git"
+    "url": "git+https://github.com/huytdps13400/react-native-country-codes-picker.git"
   },
   "keywords": [
     "react-native",
@@ -23,13 +23,13 @@
   "author": "George Hope",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/GeorgeHop/react-native-country-codes-picker/issues"
+    "url": "https://github.com/huytdps13400/react-native-country-codes-picker/issues"
   },
   "contributors": [
     {
-      "name": "Mutovkin Yurii",
-      "email": "georgehopekek@gmail.com",
-      "url": "https://github.com/GeorgeHop"
+      "name": "Huy Tran",
+      "email": "huytdps13400@gmail.com",
+      "url": "https://github.com/huytdps13400"
     }
   ],
   "peerDependencies": {
@@ -41,5 +41,8 @@
     "@types/react-native": "~0.69.1",
     "typescript": "^4.8.2"
   },
-  "homepage": "https://github.com/GeorgeHop/react-native-country-codes-picker#readme"
+  "homepage": "https://github.com/huytdps13400/react-native-country-codes-picker#readme",
+  "dependencies": {
+    "react-native-reanimated": "^3.18.0"
+  }
 }
