@@ -1,38 +1,46 @@
-# react-native-country-codes-picker
+# React Native Country Codes Picker
 
-:zap: :zap: :zap: This lib. provide multi lang. country picker or country list with search functionality. Fully crossplatform and supported on React-native and expo.
-Didn't find your country ? Just add the required countries or locales and make a PR. :zap: :zap: :zap:
+⚡️ A versatile, multilingual country picker and country list component with search functionality for React Native and Expo applications. Fully cross-platform with support for multiple languages and customizable styling.
 
-## :exclamation: Before you start! :exclamation:
+## Features
 
-I'm looking to enhance this library and would love to hear your thoughts on what features you'd like to see in the next version. Currently, I'm drafting a roadmap for the upcoming release of react-native-country-codes-picker.
+- Modal and List view components
+- Multi-language support
+- Search functionality with diacritics handling
+- Customizable styling
+- Popular countries section
+- Custom header components
+- Keyboard avoidance
+- Accessibility support
+- React Native Reanimated v3 support
 
-Considering whether the next version should be based on reanimated v3 for improved performance or if it's better to introduce a flexible hook instead of a new component. Your input is crucial in guiding the development, so please share your ideas on the most valuable additions or changes you'd like to see.
+## Installation
 
-## Coming soon :muscle: :pray:
+```bash
+# Using npm
+npm install react-native-country-codes-picker
 
-1. Custom search input rendering.
-2. Docs update/improve for the best user experience.
-3. Animation improvements.
+# Using yarn
+yarn add react-native-country-codes-picker
 
-If you have something interesting ! Just write to us :)
+# Using expo
+expo install react-native-country-codes-picker
+```
 
-# :grey_exclamation: Installation :grey_exclamation:
+This package requires `react-native-reanimated` (>= 3.0.0) as a peer dependency.
 
-expo: `expo install react-native-country-codes-picker`  
-npm: `npm i react-native-country-codes-picker`  
-yarn: `yarn add react-native-country-codes-picker`
-
-# Example
+## Example
 
 ![ezgif com-gif-maker](https://user-images.githubusercontent.com/47904385/195978433-29982bec-b5cc-4d2a-ba01-4eb686005567.gif)
 
-# Basic usage
+## Basic Usage
 
-### Modal
+### Modal Component
 
-```JS
-import {CountryPicker} from "react-native-country-codes-picker";
+```jsx
+import { CountryPicker } from "react-native-country-codes-picker";
+import { useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 
 export default function App() {
   const [show, setShow] = useState(false);
@@ -43,37 +51,40 @@ export default function App() {
       <TouchableOpacity
         onPress={() => setShow(true)}
         style={{
-            width: '80%',
-            height: 60,
-            backgroundColor: 'black',
-            padding: 10,
+          width: '80%',
+          height: 60,
+          backgroundColor: 'black',
+          padding: 10,
         }}
       >
         <Text style={{
-            color: 'white',
-            fontSize: 20
+          color: 'white',
+          fontSize: 20
         }}>
-            {countryCode}
+          {countryCode || "Select Country"}
         </Text>
       </TouchableOpacity>
 
-      // For showing picker just put show state to show prop
       <CountryPicker
         show={show}
-        // when picker button press you will get the country object with dial code
         pickerButtonOnPress={(item) => {
           setCountryCode(item.dial_code);
           setShow(false);
         }}
+        onBackdropPress={() => setShow(false)}
       />
     </View>
   );
 }
 ```
 
-### Modal with list header
-```JS
-import {CountryPicker} from "react-native-country-codes-picker";
+### Modal with Popular Countries Header
+
+```jsx
+import { CountryPicker } from "react-native-country-codes-picker";
+import { CountryButton } from "react-native-country-codes-picker";
+import { useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 
 function ListHeaderComponent({countries, lang, onPress}) {
     return (
@@ -87,7 +98,12 @@ function ListHeaderComponent({countries, lang, onPress}) {
             </Text>
             {countries?.map((country, index) => {
                 return (
-                    <CountryButton key={index} item={country} name={country?.name?.[lang || 'en']} onPress={() => onPress(country)} />
+                    <CountryButton 
+                        key={index} 
+                        item={country} 
+                        name={country?.name?.[lang || 'en']} 
+                        onPress={() => onPress(country)} 
+                    />
                 )
             })}
         </View>
@@ -103,40 +119,41 @@ export default function App() {
       <TouchableOpacity
         onPress={() => setShow(true)}
         style={{
-            width: '80%',
-            height: 60,
-            backgroundColor: 'black',
-            padding: 10,
+          width: '80%',
+          height: 60,
+          backgroundColor: 'black',
+          padding: 10,
         }}
       >
         <Text style={{
-            color: 'white',
-            fontSize: 20
+          color: 'white',
+          fontSize: 20
         }}>
-            {countryCode}
+          {countryCode || "Select Country"}
         </Text>
       </TouchableOpacity>
 
-      // For showing picker just put show state to show prop
       <CountryPicker
         show={show}
-        // when picker button press you will get the country object with dial code
         pickerButtonOnPress={(item) => {
           setCountryCode(item.dial_code);
           setShow(false);
         }}
+        onBackdropPress={() => setShow(false)}
         ListHeaderComponent={ListHeaderComponent}
-        popularCountries={['en', 'ua', 'pl']}
+        popularCountries={['us', 'gb', 'ca', 'au']}
       />
     </View>
   );
 }
 ```
 
-### List
+### List Component
 
-```js
-import {CountryList} from "react-native-country-codes-picker";
+```jsx
+import { CountryList } from "react-native-country-codes-picker";
+import { useState } from "react";
+import { View, Text } from "react-native";
 
 export default function App() {
   const [countryCode, setCountryCode] = useState('');
@@ -145,149 +162,191 @@ export default function App() {
     <View style={styles.container}>
       <View        
         style={{
-            width: '80%',
-            height: 60,
-            backgroundColor: 'black',
-            padding: 10,
+          width: '80%',
+          height: 60,
+          backgroundColor: 'black',
+          padding: 10,
         }}
       >
         <Text style={{
-            color: 'white',
-            fontSize: 20
+          color: 'white',
+          fontSize: 20
         }}>
-            {countryCode}
+          {countryCode || "Select Country"}
         </Text>
-      </TouchableOpacity>
+      </View>
 
-      // All props the same as for picker
-       <CountryList
-          lang={'pl'}
-          pickerButtonOnPress={(item) => {
-              setCountryCode(item.dial_code);
-          }}
-       />
+      <CountryList
+        lang="en"
+        pickerButtonOnPress={(item) => {
+          setCountryCode(item.dial_code);
+        }}
+      />
     </View>
   );
 }
 ```
 
-# Props
+## Props
 
-Below are the props you can pass to the React Component.
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `show` | boolean | | Controls the visibility of the modal picker. |
+| `pickerButtonOnPress` | function | | Callback function that receives the selected country data. |
+| `inputPlaceholder` | string | | Custom placeholder text for the search input. |
+| `searchMessage` | string | | Custom message shown during search. |
+| `lang` | string | 'en' | Language code for country names (see Supported Languages). |
+| `enableModalAvoiding` | boolean | false | Enable keyboard avoidance for the modal. |
+| `androidWindowSoftInputMode` | string | | Android-specific keyboard behavior ('pan' recommended if enableModalAvoiding is true). |
+| `itemTemplate` | ReactNode | CountryButton | Custom template component for list items (receives: key, item, style, name, onPress). |
+| `style` | Object | | Custom styles object for the component (see Styling section). |
+| `disableBackdrop` | boolean | false | Disables the modal backdrop if set to true. |
+| `onBackdropPress` | function | | Callback function when the backdrop is pressed. |
+| `initialState` | string | | Pre-selects a country by dial code (e.g., '+1'). |
+| `excludedCountries` | string[] | | Array of country codes to exclude from the list. |
+| `showOnly` | string[] | | Array of country codes to exclusively show in the list. |
+| `popularCountries` | string[] | | Array of country codes to pass to ListHeaderComponent as popular countries. |
+| `ListHeaderComponent` | JSX.Element | | Custom header component for the list (receives: countries, lang, onPress). |
 
-| Prop                       | Type      | Default | Example                                    | Description                                                                                                                                                               |
-| -------------------------- | --------- | ------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| show                       | boolean   |         |                                            | This prop using for displaying the modal. Put your show state here.                                                                                                       |
-| pickerButtonOnPress        | function  |         | (country) => setCode(country.dial_code)    | Put your function/functions here for getting country data from picker.                                                                                                    |
-| inputPlaceholder           | string    |         | inputPlaceholder={'Your placeholder'}      | If you need a custom placeholder for your input you may need this prop.                                                                                                   |
-| searchMessage              | string    |         | searchMessage={'Some search message here'} | If you want to customize search message just use this prop.                                                                                                               |
-| lang                       | string    | 'en'    | lang={'pl'}                                | If you need to change the lang. just put one of supported lang. Or if you didn't find required lang just add them and make a PR :)                                        |
-| enableModalAvoiding        | boolean   | false   | enableModalAvoiding={true}                 | Is modal should avoid keyboard ? On android to work required to use with androidWindowSoftInputMode with value pan, by default android will avoid keyboard by itself      |
-| androidWindowSoftInputMode | string    |         | androidWindowSoftInputMode={'pan'}         | Basicaly android avoid keyboard by itself, if you want to use custom avoiding you may use this prop                                                                       |
-| itemTemplate               | ReactNode |    CountryButton     | itemTemplate={YourTemplateComponentsHere}  | This parameter gets a React Node element to render it as a template for each item of the list. These properties are sent to the item: key, item, style, name, and onPress |
-| style                      | Object    |         | style={{yoursStylesHere}}                  | If you want to change styles for component you probably need this props. You can check the styling part below.                                                            |
-| disableBackdrop                      | boolean    |     false    | disableBackdrop   | if you don't wanna show modal backdrop pass this prop.|
-| onBackdropPress                      | function    |     null    | onBackdropPress={() => setShow(false)}  | If you want to close modal when user taps on the modal background. |
-| initialState  | string    |         | initialState={'+380'}  | Sometimes you need to pre-select country for example by user current location so you may use this prop. |
-| excludedCountries  | array    |         | excludedCountries={['RU', 'BY']}  | In this prop you can define list of countries which you want to remove by adding their codes. |
-| showOnly  | array    |         | showOnly={['UA', 'EN']}  | This prop allow you to configure which countries you want to show. |
-| popularCountries  | array    |         | popularCountries={['UA', 'EN']}  | This prop allow you to send popular countries array to your ListHeaderComponent. |
-| ListHeaderComponent  | JSX.Element    |         | ListHeaderComponent={ListHeaderComponent}  | This prop allow you to create header component to show popular countries on top of list! Check example section with ListHeaderComponent  |
+Additionally, you can use any standard props from React Native's `FlatList` and `TextInput` components for further customization.
 
-:grey_exclamation: Also you can use all other FlatList and TextInput props if you need. :grey_exclamation:
+## Performance Props
 
-# Styling
+The component also accepts performance optimization props:
 
-```JS
+| Prop | Type | Description |
+|------|------|-------------|
+| `getItemLayout` | function | Pre-computes heights for better performance. |
+| `windowSize` | number | Number of items to render in the window. |
+| `removeClippedSubviews` | boolean | Detaches off-screen views to improve memory usage. |
+| `maxToRenderPerBatch` | number | Maximum number of items to render per batch. |
+| `initialNumToRender` | number | Initial number of items to render. |
+
+## Accessibility Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `accessibilityLabel` | string | Accessibility label for the picker. |
+| `accessibilityHint` | string | Accessibility hint for the picker. |
+| `accessibilityRole` | string | Accessibility role for the picker. |
+| `searchAccessibilityLabel` | string | Accessibility label for the search input. |
+| `searchAccessibilityHint` | string | Accessibility hint for the search input. |
+| `countryItemAccessibilityLabel` | function | Function that returns accessibility label for country items. |
+| `countryItemAccessibilityHint` | string | Accessibility hint for country items. |
+
+## Styling
+
+You can customize the appearance using the `style` prop:
+
+```jsx
 <CountryPicker
     show={show}
-    lang={'cz'}
+    lang="en"
     style={{
-        // Styles for whole modal [View]
+        // Modal container
         modal: {
             height: 500,
-            backgroundColor: 'red'
+            backgroundColor: '#FFFFFF',
+            borderRadius: 10,
         },
-        // Styles for modal backdrop [View]
+        // Modal backdrop
         backdrop: {
-        
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
         },
-        // Styles for bottom input line [View]
+        // Bottom line separator
         line: {
-        
+            backgroundColor: '#DDDDDD',
+            height: 1,
         },
-        // Styles for list of countries [FlatList]
+        // Countries list
         itemsList: {
-        
+            paddingVertical: 5,
         },
-        // Styles for input [TextInput]
+        // Search input
         textInput: {
-              height: 80,
-              borderRadius: 0,
+            height: 50,
+            borderRadius: 10,
+            padding: 10,
+            backgroundColor: '#F0F0F0',
         },
-        // Styles for country button [TouchableOpacity]
+        // Country button
         countryButtonStyles: {
-              height: 80
+            height: 60,
         },
-        // Styles for search message [Text]
+        // Search message text
         searchMessageText: {
-
+            fontSize: 16,
+            color: '#888888',
         },
-        // Styles for search message container [View]
+        // Search message container
         countryMessageContainer: {
-        
+            padding: 20,
         },
-        // Flag styles [Text]
+        // Flag text
         flag: {
-
+            fontSize: 24,
         },
-        // Dial code styles [Text]
+        // Dial code text
         dialCode: {
-
+            fontSize: 14,
+            color: '#666666',
         },
-        // Country name styles [Text]
+        // Country name text
         countryName: {
-
+            fontSize: 16,
+            color: '#333333',
         }
     }}
     pickerButtonOnPress={(item) => {
         setCountryCode(item.dial_code);
         setShow(false);
     }}
+    onBackdropPress={() => setShow(false)}
 />
 ```
 
-# :crossed_flags: Supported langs. :crossed_flags:
+## Supported Languages
 
-```JS 
-  "name": {
-    "en": "English",
-    "ru": "Russian",
-    "pl": "Polish",
-    "ua": "Ukrainian",
-    "cz": "Czech",
-    "by": "Belarusian",
-    "pt": "Portuguese",
-    "es": "Espanol",
-    "ro": "Romanian",
-    "bg": "Bulgarian",
-    "de": "German",
-    "fr": "French",
-    "nl": "Dutch",
-    "it": "Italian",
-    "cn": "Chinese",
-    "ee": "Estonian",
-    "jp": "Japanese",
-    "he": "Hebrew",
-    "tr": "Turkish"
-  },
+The component includes translations for country names in the following languages:
+
+```
+en - English
+ru - Russian
+pl - Polish
+ua - Ukrainian
+cz - Czech
+by - Belarusian
+pt - Portuguese
+es - Spanish
+ro - Romanian
+bg - Bulgarian
+de - German
+fr - French
+nl - Dutch
+it - Italian
+cn - Chinese
+ee - Estonian
+jp - Japanese
+he - Hebrew
+tr - Turkish
 ```
 
-You can add your lang. if you need !!! But after that make a PR please, it will help other people.
+## Testing
 
-# Testing
+For automated testing, the component provides the following test IDs:
 
-If you are using this package and need to target one of the components in your automated tests, we currently do provide a `testID` for the following components:
-- The wrapping `FlatList` component: 'countryCodesPickerFlatList'
-- The country search `TextInput` component: 'countryCodesPickerSearchInput'
-- The country button (`TouchableOpacity`) component: 'countryCodesPickerCountryButton'
+- The wrapping `FlatList`: `countryCodesPickerFlatList`
+- The search `TextInput`: `countryCodesPickerSearchInput`
+- The country button `TouchableOpacity`: `countryCodesPickerCountryButton`
+
+## Contributing
+
+Contributions are welcome! If you'd like to add support for additional languages or features, please create a pull request.
+
+## License
+
+ISC
+
+---
+
+Created by George Hope with contributions from Huy Tran and the community.

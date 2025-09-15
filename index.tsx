@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useRef,
   useState,
+  JSX,
 } from "react";
 import {
   Dimensions,
