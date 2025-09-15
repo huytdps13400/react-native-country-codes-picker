@@ -34,15 +34,14 @@
   ],
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-reanimated": "^3.18.0"
   },
   "devDependencies": {
     "@types/react": "~18.0.0",
     "@types/react-native": "~0.69.1",
-    "typescript": "^4.8.2"
-  },
-  "homepage": "https://github.com/huytdps13400/react-native-country-codes-picker#readme",
-  "dependencies": {
+    "typescript": "^4.8.2",
     "react-native-reanimated": "^3.18.0"
-  }
+  },
+  "homepage": "https://github.com/huytdps13400/react-native-country-codes-picker#readme"
 }
