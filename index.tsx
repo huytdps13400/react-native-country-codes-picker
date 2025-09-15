@@ -391,8 +391,8 @@ export const CountryPicker = ({
               initialNumToRender={10}
               maxToRenderPerBatch={10}
               windowSize={10}
-              removeClippedSubviews={Platform.OS !== "web"} // Tối ưu hiệu năng
-              getItemLayout={rest.getItemLayout || getItemLayout} // Cho phép override
+              removeClippedSubviews={Platform.OS !== "web"}
+              getItemLayout={rest.getItemLayout || getItemLayout}
               style={[style?.itemsList]}
               keyboardShouldPersistTaps={"handled"}
               renderItem={renderItem}
