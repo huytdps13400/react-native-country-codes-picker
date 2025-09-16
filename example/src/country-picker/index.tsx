@@ -18,7 +18,6 @@ import {
   ViewStyle,
 } from "react-native";
 import Animated, {
-  Easing,
   Extrapolate,
   interpolate,
   runOnJS,
@@ -125,9 +124,7 @@ export const CountryPicker = ({
   ...rest
 }: Props) => {
   // ToDo refactor exclude and showOnly props to objects
-  const filteredCodes = useMemo(() => {
-    return countriesRemover(excludedCountries);
-  }, [excludedCountries]);
+  let filteredCodes = countriesRemover(excludedCountries);
   const keyboardStatus = useKeyboardStatus();
   const flatListRef = useRef<FlatList>(null);
 
@@ -136,21 +133,7 @@ export const CountryPicker = ({
   const keyboardMargin = useSharedValue(0);
 
   const [searchValue, setSearchValue] = useState<string>(initialState || "");
-  const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>(
-    initialState || ""
-  );
   const [showModal, setShowModal] = useState<boolean>(false);
-
-  const hideModal = useCallback(() => {
-    setShowModal(false);
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchValue(searchValue);
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [searchValue]);
 
   useEffect(() => {
     if (show) {
@@ -200,19 +183,20 @@ export const CountryPicker = ({
   }, [showOnly, excludedCountries, lang, filteredCodes]);
 
   const resultCountries = useMemo(() => {
-    const trimmed = debouncedSearchValue.trim().toLowerCase();
+    const trimmed = searchValue.trim().toLowerCase();
     return codes.filter((country) => {
       const name = (country?.name[lang || "en"] || "").toLowerCase();
       return (
-        country?.dial_code.includes(debouncedSearchValue) ||
+        country?.dial_code.includes(searchValue) ||
         name.includes(trimmed) ||
         removeDiacritics(name).includes(trimmed)
       );
     });
-  }, [debouncedSearchValue, codes, lang]);
+  }, [searchValue, codes, lang]);
 
   useEffect(() => {
     if (showModal && scrollToInitialCountry && initialCountry && !searchValue) {
+      // Chỉ scroll khi không có search value
       const selectedIndex = codes.findIndex((country) =>
         country.dial_code.includes(initialCountry)
       );
@@ -252,7 +236,6 @@ export const CountryPicker = ({
 
   // Animated styles
   const modalAnimatedStyle = useAnimatedStyle(() => {
-    "worklet";
     const translateY = interpolate(
       progress.value,
       [0, 1],
@@ -262,44 +245,35 @@ export const CountryPicker = ({
     return {
       transform: [{ translateY }],
     };
-  });
+  }, []);
 
   const backdropAnimatedStyle = useAnimatedStyle(() => {
-    "worklet";
-    return {
-      opacity: progress.value,
-    };
-  });
+    const opacity = interpolate(
+      progress.value,
+      [0, 0.5, 1],
+      [0, 0.5, 1],
+      Extrapolate.CLAMP
+    );
+    return { opacity };
+  }, []);
 
   const keyboardSpacerStyle = useAnimatedStyle(() => {
-    "worklet";
     return {
       height: keyboardMargin.value,
     };
-  });
+  }, []);
 
-  const openModal = useCallback(() => {
-    progress.value = withTiming(1, {
-      duration: 150,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [progress]);
+  const openModal = () => {
+    progress.value = withTiming(1, { duration: 400 });
+  };
 
-  const closeModal = useCallback(() => {
-    progress.value = withTiming(
-      0,
-      {
-        duration: 120,
-        easing: Easing.in(Easing.cubic),
-      },
-      (finished) => {
-        "worklet";
-        if (finished) {
-          runOnJS(hideModal)();
-        }
+  const closeModal = () => {
+    progress.value = withTiming(0, { duration: 400 }, (finished) => {
+      if (finished) {
+        runOnJS(setShowModal)(false);
       }
-    );
-  }, [progress]);
+    });
+  };
 
   const renderItem = useCallback(
     ({ item, index }: { item: CountryItem; index: number }) => {
@@ -308,6 +282,7 @@ export const CountryPicker = ({
 
       return (
         <ItemTemplate
+          key={index}
           item={item}
           style={style}
           name={checkName}
@@ -333,7 +308,7 @@ export const CountryPicker = ({
 
   const getItemLayout = useCallback(
     (data: any, index: number) => ({
-      length: 56,
+      length: 56, // Chiều cao cố định của CountryButton (50 + marginVertical 2*2 + padding)
       offset: 56 * index,
       index,
     }),
