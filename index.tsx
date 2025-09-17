@@ -18,13 +18,10 @@ import {
   ViewStyle,
 } from "react-native";
 import Animated, {
-  Easing,
   Extrapolate,
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withTiming,
 } from "react-native-reanimated";
 import { CountryButton } from "./components/CountryButton";
 import { countriesRemover } from "./helpers/countriesRemover";
@@ -77,6 +74,7 @@ interface Props {
   show: boolean;
   enableModalAvoiding?: boolean;
   disableBackdrop?: boolean;
+  disableAnimation?: boolean; // Tắt animation để tăng performance
 
   onBackdropPress?: (...args: any) => any;
   pickerButtonOnPress: (item: CountryItem) => any;
@@ -113,6 +111,7 @@ export const CountryPicker = ({
   androidWindowSoftInputMode,
   onBackdropPress,
   disableBackdrop,
+  disableAnimation = false,
   excludedCountries,
   initialState,
   onRequestClose,
@@ -131,7 +130,7 @@ export const CountryPicker = ({
   const keyboardStatus = useKeyboardStatus();
   const flatListRef = useRef<FlatList>(null);
 
-  // Reanimated shared values
+  // Reanimated shared values - đơn giản hóa
   const progress = useSharedValue(0); // 0 -> hidden, 1 -> visible
   const keyboardMargin = useSharedValue(0);
 
@@ -168,11 +167,9 @@ export const CountryPicker = ({
           androidWindowSoftInputMode === "pan"))
     ) {
       if (keyboardStatus.isOpen) {
-        keyboardMargin.value = withTiming(keyboardStatus.keyboardHeight, {
-          duration: 190,
-        });
+        keyboardMargin.value = keyboardStatus.keyboardHeight;
       } else {
-        keyboardMargin.value = withTiming(0, { duration: 190 });
+        keyboardMargin.value = 0;
       }
     }
   }, [keyboardStatus.isOpen, enableModalAvoiding, androidWindowSoftInputMode]);
@@ -250,9 +247,13 @@ export const CountryPicker = ({
     []
   );
 
-  // Animated styles
   const modalAnimatedStyle = useAnimatedStyle(() => {
     "worklet";
+    if (disableAnimation) {
+      return {
+        transform: [{ translateY: show ? 0 : height }],
+      };
+    }
     const translateY = interpolate(
       progress.value,
       [0, 1],
@@ -266,6 +267,11 @@ export const CountryPicker = ({
 
   const backdropAnimatedStyle = useAnimatedStyle(() => {
     "worklet";
+    if (disableAnimation) {
+      return {
+        opacity: show ? 1 : 0,
+      };
+    }
     return {
       opacity: progress.value,
     };
@@ -279,27 +285,28 @@ export const CountryPicker = ({
   });
 
   const openModal = useCallback(() => {
-    progress.value = withTiming(1, {
-      duration: 150,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [progress]);
+    if (disableAnimation) {
+      progress.value = 1;
+    } else {
+      // Sử dụng setTimeout thay vì withTiming để tránh conflict
+      progress.value = 0;
+      setTimeout(() => {
+        progress.value = 1;
+      }, 16); // 1 frame delay
+    }
+  }, [progress, disableAnimation]);
 
   const closeModal = useCallback(() => {
-    progress.value = withTiming(
-      0,
-      {
-        duration: 120,
-        easing: Easing.in(Easing.cubic),
-      },
-      (finished) => {
-        "worklet";
-        if (finished) {
-          runOnJS(hideModal)();
-        }
-      }
-    );
-  }, [progress]);
+    if (disableAnimation) {
+      progress.value = 0;
+      hideModal();
+    } else {
+      progress.value = 0;
+      setTimeout(() => {
+        hideModal();
+      }, 100);
+    }
+  }, [progress, disableAnimation, hideModal]);
 
   const renderItem = useCallback(
     ({ item, index }: { item: CountryItem; index: number }) => {
